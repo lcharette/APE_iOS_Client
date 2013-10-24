@@ -12,17 +12,13 @@
 
 /*
  TODO:
+ - EVENT & alert when connexion impossible to server
  - Get user method (get only one user; By pubid/name)
- - Leave Channel
- - Event when the server is disconnecting
- - Deconnect socket when entering background
- - Handle reconnection
  - Handle sessions
  - Non-blocking stuff...
 */
 
 @implementation APEClient {
-    BOOL APE_connected;
     BOOL APE_socket_input_open;
     BOOL APE_socket_output_open;
     BOOL APE_socket_output_ready;
@@ -31,10 +27,9 @@
     NSString *APE_sessid;
     NSInteger APE_chl;
 }
-@synthesize inputStream, outputStream, APE_host, APE_port, APE_name, APE_debug, APE_channelList;
+@synthesize inputStream, outputStream, APE_host, APE_port, APE_name, APE_debug, APE_channelList, APE_connected;
 
 + (id)APEClient_init {
-    NSLog(@"APEClient_init");
     static APEClient *init = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -45,6 +40,8 @@
 
 - (id)init {
     if (self = [super init]) {
+        
+        NSLog(@"APEClient_init");
         
         //Default variables here
         APE_debug = FALSE;
@@ -64,6 +61,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(raw_CHANNEL:) name:@"APE_CHANNEL" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(raw_JOIN:) name:@"APE_JOIN" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(raw_LEFT:) name:@"APE_LEFT" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(disconnect) name:@"APE_DISCONNECT" object:nil];
     }
     return self;
 }
@@ -130,6 +128,7 @@
     }
 }
 
+
 -(void)sendCmdToChannel:(NSString *)command :(NSString *)channelName
 {
     [self sendCmdToChannel:command :channelName :nil];
@@ -147,19 +146,41 @@
     
     NSLog(@"APE CLient: Connecting to %@:%ld", APE_host, APE_port);
     
+    //Just in case, we reset the vars
+    [self disconnect];
+    
+    //Create the socket
     CFReadStreamRef readStream;
 	CFWriteStreamRef writeStream;
 	CFStreamCreatePairWithSocketToHost(NULL, APE_host, APE_port, &readStream, &writeStream);
 	
+    //Setup the input stream for reading data from APE
 	self.inputStream = (__bridge_transfer NSInputStream *)readStream;
 	[self.inputStream setDelegate:self];
 	[self.inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 	[self.inputStream open];
 	
+    //Setup output stream to write to APE
     self.outputStream = (__bridge_transfer NSOutputStream *)writeStream;
     [self.outputStream setDelegate:self];
     [self.outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [self.outputStream open];
+}
+
+//This one is only good if port & host is already defined
+-(void)connect
+{
+    if (self.APE_port == 0 || self.APE_host == nil) {
+        NSLog(@"APE HOST OR PORT NOT DEFINED");
+    } else {
+        [self connect:CFBridgingRelease(APE_host) :APE_port];
+    }
+}
+
+-(void)quit
+{
+    [self sendCmd:@"QUIT"];
+    [self disconnect];
 }
 
 - (NSString *) getChannelPubidFromName:(NSString *)channelName
@@ -191,8 +212,15 @@
 -(void) joinChannel:(NSString *)channelName
 {
     NSMutableDictionary *dataToSend = [[NSMutableDictionary alloc] init];
-    [dataToSend setObject:@"test" forKey:@"channels"];
+    [dataToSend setObject:channelName forKey:@"channels"];
     [self sendCmd:@"JOIN" :dataToSend];
+}
+
+-(void) leftChannel:(NSString *)channelName
+{
+    NSMutableDictionary *dataToSend = [[NSMutableDictionary alloc] init];
+    [dataToSend setObject:channelName forKey:@"channel"];
+    [self sendCmd:@"LEFT" :dataToSend];
 }
 
 # pragma mark - Request parser
@@ -417,6 +445,7 @@
 			
 			NSLog(@"Can not connect to the host!");
             //TODO: Event..
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"APE_CONNECT_ERR" object:self userInfo:nil];
 			
             break;
             
@@ -439,32 +468,59 @@
 		case NSStreamEventEndEncountered:
             
             if (theStream == inputStream) {
-                
                 NSLog(@"Stream input closed");
-                APE_connected = FALSE;
-                
+                //We can't received anything anymore
                 APE_socket_input_open = FALSE;
                 
                 //Stop the check timeout
                 [APE_Check invalidate];
                 
+                //Push an event. This event will take care of closing the sockets
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"APE_DISCONNECT" object:self userInfo:nil];
+                
             } else if (theStream == outputStream) {
-                NSLog(@"Stream output closed");
+                 NSLog(@"Stream output closed");
+                //We can't send anything anymore.
                 APE_socket_output_open = APE_socket_output_ready = FALSE;
                 
+                //Push an event. This event will take care of closing the sockets
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"APE_DISCONNECT" object:self userInfo:nil];
+                
             } else {
+                
                 NSLog(@"Stream unknown closed");
+                
+                [theStream close];
+                [theStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+                theStream = nil;
             }
-            
-            [theStream close];
-            [theStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-            theStream = nil;
             
             break;
             
         default:
             break;
 	}
+}
+
+-(void) disconnect
+{
+    //Close both streams
+    //First the output
+    [self.outputStream close];
+    [self.outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    self.outputStream = nil;
+    
+    //Then the input one
+    [self.inputStream close];
+    [self.inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    self.inputStream = nil;
+    
+    //Clear some variables and objects
+    APE_name = @"";
+    APE_socket_input_open = APE_socket_output_open = APE_socket_output_ready = FALSE;
+    APE_connected = FALSE;
+    APE_init_connection = FALSE;
+    APE_channelList = [[NSMutableDictionary alloc] init];
 }
 
 #pragma mark - String Encoding

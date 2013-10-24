@@ -54,12 +54,16 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateUserList:) name:@"APE_JOIN" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateUserList:) name:@"APE_LEFT" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateUserList:) name:@"APE_CHANNEL" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(raw_CHANNEL:) name:@"APE_CHANNEL" object:nil]; //The same event can have multiple listener...
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(raw_CONNECT) name:@"APE_CONNECT" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(raw_DISCONNECT) name:@"APE_DISCONNECT" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(APE_CONNECT_ERR) name:@"APE_CONNECT_ERR" object:nil];
     
     //Adding keyboard handler to resize the view when the keybaord appear
     keyboard = [[KBKeyboardHandler alloc] init];
     keyboard.delegate = self;
     
-    //We fix bouncing
+    //We fix bouncing when not needed (ugly)
     userTableView.alwaysBounceVertical = NO;
     msgTableView.alwaysBounceVertical = NO;
     
@@ -108,6 +112,35 @@
     
     //Append the message
     [self appendMsg:msg:from];
+}
+
+-(void) raw_CHANNEL:(NSNotification *)notification
+{
+    //We are connected to the channel. The text input is enabled.
+    self.msgInput.text = @"";
+    self.msgInput.enabled = TRUE;
+}
+
+-(void) raw_CONNECT
+{
+    self.msgInput.text = @"Connecting to 'test' channel";
+}
+
+-(void) raw_DISCONNECT
+{
+    self.msgInput.text = @"Connexion to the server lost";
+    self.msgInput.enabled = FALSE;
+}
+
+-(void) APE_CONNECT_ERR
+{
+    //Show an alert
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"APE Error"
+                                                        message:@"Can't connect to APE Server !"
+                                                       delegate:self
+                                              cancelButtonTitle:@"Ok"
+                                              otherButtonTitles:nil, nil];
+    [alertView show];
 }
 
 -(void) appendMsg:(NSString *)msg :(NSString *)from
@@ -238,7 +271,8 @@
     //Get the string
     NSString *msg = [msgInput text];
     
-    if (![msg  isEqual: @""]) {
+    //Test if the message is not blank and if APE is connected
+    if (![msg  isEqual: @""] && client.APE_connected) {
         
         //Append the message
         [self appendMsg:msg:client.APE_name];
@@ -253,6 +287,8 @@
         
         //Clear the text input
         msgInput.text = @"";
+    } else if (!client.APE_connected) {
+        [client connect];
     }
 }
 

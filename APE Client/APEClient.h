@@ -17,6 +17,7 @@
 @property (nonatomic) NSString *APE_name;
 @property (nonatomic) BOOL APE_debug;
 @property (nonatomic) NSMutableDictionary *APE_channelList;
+@property (nonatomic) BOOL APE_connected;
 
 + (id)APEClient_init;
 
@@ -25,8 +26,11 @@
 -(void)sendCmdToChannel:(NSString *)command :(NSString *)channelName;
 -(void)sendCmdToChannel:(NSString *)command :(NSString *)channelName :(NSMutableDictionary *) data;
 -(void)connect:(NSString*)host :(long)port;
+-(void)connect;
+-(void) quit;
 -(NSString *)getChannelPubidFromName:(NSString *)channelName;
 -(void) joinChannel:(NSString *)channelName;
+-(void) leftChannel:(NSString *)channelName;
 -(NSString*) encodeToPercentEscapeString:(NSString *)string;
 - (NSDictionary *) getChannelUsersFromName:(NSString *)channelName;
 - (NSDictionary *) getChannelUsersfromPubid:(NSString *)channelPubid;
