@@ -6,6 +6,8 @@ The client consist for now in a demo iPad app. This demo app connect and can exc
 
 This code is still in beta stage. It does connect and interact with the chat demo, but hasn't been fully tested and implemented yet. See **Contribute** for more infos.
 
+![iPad](http://i.imgur.com/NXBTWQI.png)
+![Chrome](http://i.imgur.com/KAoJnfF.png)
 
 # What is APE?
 APE is a full-featured OpenSource solution designed for Ajax Push. It includes a comet server and a Javascript Framework. APE allows to implement any kind of real-time data streaming to a web browser, without having to install anything on the client-side.
