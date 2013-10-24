@@ -12,7 +12,6 @@
 
 /*
  TODO:
- - EVENT & alert when connexion impossible to server
  - Get user method (get only one user; By pubid/name)
  - Handle sessions
  - Non-blocking stuff...
@@ -24,6 +23,7 @@
     BOOL APE_socket_output_ready;
     BOOL APE_init_connection;
     NSTimer *APE_Check;
+    NSTimer *APE_connection_timeout;
     NSString *APE_sessid;
     NSInteger APE_chl;
 }
@@ -165,6 +165,14 @@
     [self.outputStream setDelegate:self];
     [self.outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [self.outputStream open];
+    
+    //Start a timer for connection timeout
+    [APE_connection_timeout invalidate];
+    APE_connection_timeout = [NSTimer scheduledTimerWithTimeInterval: 15.0
+                                                 target: self
+                                               selector: @selector(connect_err)
+                                               userInfo: nil
+                                                repeats: YES];
 }
 
 //This one is only good if port & host is already defined
@@ -272,6 +280,8 @@
 
 -(void) raw_CONNECT:(NSNotification *)notification
 {
+    [APE_connection_timeout invalidate];
+    
     //Prepare the dictionary wiuth the data to send
     NSMutableDictionary *dataToSend = [[NSMutableDictionary alloc] init];
     
@@ -399,6 +409,8 @@
 
 - (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
     
+    NSLog(@"streamEvent: %u", streamEvent);
+    
 	switch (streamEvent) {
 			
 		case NSStreamEventOpenCompleted:
@@ -521,6 +533,12 @@
     APE_connected = FALSE;
     APE_init_connection = FALSE;
     APE_channelList = [[NSMutableDictionary alloc] init];
+}
+
+-(void) connect_err
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"APE_CONNECT_ERR" object:self userInfo:nil];
+    [self disconnect];
 }
 
 #pragma mark - String Encoding
