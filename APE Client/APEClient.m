@@ -408,9 +408,7 @@
 # pragma mark - Socket Handle
 
 - (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
-    
-    NSLog(@"streamEvent: %u", streamEvent);
-    
+        
 	switch (streamEvent) {
 			
 		case NSStreamEventOpenCompleted:
