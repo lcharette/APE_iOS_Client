@@ -9,14 +9,6 @@
 #import "APEClient.h"
 #include <stdlib.h>
 
-
-/*
- TODO:
- - Get user method (get only one user; By pubid/name)
- - Handle sessions
- - Non-blocking stuff...
-*/
-
 @implementation APEClient {
     BOOL APE_socket_input_open;
     BOOL APE_socket_output_open;
@@ -172,7 +164,7 @@
                                                  target: self
                                                selector: @selector(connect_err)
                                                userInfo: nil
-                                                repeats: YES];
+                                                repeats: NO];
 }
 
 //This one is only good if port & host is already defined
@@ -408,7 +400,7 @@
 # pragma mark - Socket Handle
 
 - (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
-        
+    
 	switch (streamEvent) {
 			
 		case NSStreamEventOpenCompleted:
