@@ -171,6 +171,7 @@
 -(void)connect
 {
     if (self.APE_port == 0 || self.APE_host == nil) {
+        //Todo: Verbose error
         NSLog(@"APE HOST OR PORT NOT DEFINED");
     } else {
         [self connect:CFBridgingRelease(APE_host) :APE_port];
@@ -183,6 +184,8 @@
     [self disconnect];
 }
 
+# pragma mark - Channel Methods
+
 - (NSString *) getChannelPubidFromName:(NSString *)channelName
 {
     NSString *channelPubid = @"";
@@ -191,7 +194,7 @@
     for (NSString* pubid in APE_channelList) {
         
         //Is the name the one we want?
-        if ([[[APE_channelList objectForKey:pubid] objectForKey:@"name"] isEqual:channelName]) {
+        if ([[[APE_channelList objectForKey:pubid] name] isEqual:channelName]) {
             channelPubid = pubid;
         }
     }
@@ -199,14 +202,24 @@
     return channelPubid;
 }
 
-- (NSDictionary *) getChannelUsersFromName:(NSString *)channelName
+- (NSArray *) getChannelUsersFromName:(NSString *)channelName
 {
-    return [self getChannelUsersfromPubid:[self getChannelPubidFromName:channelName]];
+    return [[self getChannelFromName:channelName] users];
 }
 
-- (NSDictionary *) getChannelUsersfromPubid:(NSString *)channelPubid
+- (NSArray *) getChannelUsersfromPubid:(NSString *)channelPubid
 {
-    return [[APE_channelList objectForKey:channelPubid] objectForKey:@"users"];
+    return [[self getChannelfromPubid:channelPubid] users];
+}
+
+- (APEClient_channel *) getChannelFromName:(NSString *)channelName
+{
+    return [self getChannelfromPubid:[self getChannelPubidFromName:channelName]];
+}
+
+- (APEClient_channel *) getChannelfromPubid:(NSString *)channelPubid
+{
+    return [APE_channelList objectForKey:channelPubid];
 }
 
 -(void) joinChannel:(NSString *)channelName
@@ -314,32 +327,27 @@
 {
     //Get the data
     NSDictionary *data = notification.userInfo;
-    NSMutableDictionary *channelData = [[NSMutableDictionary alloc] init];
     
-    //Is the channel already in the dictionnary?
+    //Todo: Is the channel already in the dictionnary?
     
     //Get the channel pubid
     NSDictionary *pipe = [data objectForKey:@"pipe"];
     NSString *pubid = [pipe objectForKey:@"pubid"];
     
-    //Get the channel name
-    NSString *name = [[pipe objectForKey:@"properties"] objectForKey:@"name"];
-    [channelData setObject:name forKey:@"name"];
+    //Create the channel instance
+    APEClient_channel *APE_channel = [[APEClient_channel alloc] initWithPubid:pubid];
+    APE_channel.name = [[pipe objectForKey:@"properties"] objectForKey:@"name"];
     
-    //Get the channel users
+    //Loop users and add them to the channel object
     NSDictionary *users = [data objectForKey:@"users"];
-    NSMutableDictionary *channelUsers = [[NSMutableDictionary alloc] init];
-    
-    //Loop each users in the dictionnary
     for(NSDictionary *user in users) {
-        [channelUsers setObject:[user objectForKey:@"properties"] forKey:[user objectForKey:@"pubid"]];
+        APEClient_user *This_user = [[APEClient_user alloc] initWithPubid:[user objectForKey:@"pubid"]];
+        This_user.name = [[user objectForKey:@"properties"] objectForKey:@"name"];
+        [APE_channel addUser:This_user];
     }
     
-    //Add the user thing to the dictionnary
-    [channelData setObject:channelUsers forKey:@"users"];
-    
     //Add to the dictionnary
-    [APE_channelList setObject:channelData forKey:pubid];
+    [APE_channelList setObject:APE_channel forKey:pubid];
 }
 
 -(void) raw_LEFT:(NSNotification *)notification
@@ -349,14 +357,14 @@
     NSDictionary *user = [data objectForKey:@"user"];
     NSString *channelPubid = [[data objectForKey:@"pipe"] objectForKey:@"pubid"];
     
-    //Get the pipeobj from the master channel list
-    NSMutableDictionary *pipeobj = [APE_channelList objectForKey:channelPubid];
+    //Get the channel object from the master channel list
+    APEClient_channel *APE_channel = [APE_channelList objectForKey:channelPubid];
     
     //Remove the user from the pipeobj
-    [[pipeobj objectForKey:@"users"] removeObjectForKey:[user objectForKey:@"pubid"]];
+    [APE_channel removeUserWithPubid:[user objectForKey:@"pubid"]];
     
-    //Change dans le dictionnaire principal
-    [APE_channelList setObject:pipeobj forKey:channelPubid];
+    //Update the dictionnary
+    [APE_channelList setObject:APE_channel forKey:channelPubid];
 }
 
 -(void) raw_JOIN:(NSNotification *)notification
@@ -366,14 +374,16 @@
     NSDictionary *user = [data objectForKey:@"user"];
     NSString *channelPubid = [[data objectForKey:@"pipe"] objectForKey:@"pubid"];
     
-    //Get the pipeobj from the master channel list
-    NSMutableDictionary *pipeobj = [APE_channelList objectForKey:channelPubid];
+    //Get the channel object from the master channel list
+    APEClient_channel *APE_channel = [APE_channelList objectForKey:channelPubid];
     
-    //Add the user from the pipeobj
-    [[pipeobj objectForKey:@"users"] setObject:[user objectForKey:@"properties"] forKey:[user objectForKey:@"pubid"]];
+    //Create a user objet and add it to the channel
+    APEClient_user *This_user = [[APEClient_user alloc] initWithPubid:[user objectForKey:@"pubid"]];
+    This_user.name = [[user objectForKey:@"properties"] objectForKey:@"name"];
+    [APE_channel addUser:This_user];
     
-    //Change dans le dictionnaire principal
-    [APE_channelList setObject:pipeobj forKey:channelPubid];
+    //Update the dictionnary
+    [APE_channelList setObject:APE_channel forKey:channelPubid];
 }
 
 -(void) raw_ERR:(NSNotification *)notification

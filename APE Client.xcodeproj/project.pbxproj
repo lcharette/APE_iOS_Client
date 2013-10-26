@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		66B7D215181C4D0B00E62C73 /* APEClient_user.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B7D214181C4D0B00E62C73 /* APEClient_user.m */; };
+		66B7D218181C4E9800E62C73 /* APEClient_channel.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B7D217181C4E9800E62C73 /* APEClient_channel.m */; };
 		66BB84AA18175B2E003F918C /* KBKeyboardHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 66BB84A818175B2E003F918C /* KBKeyboardHandler.m */; };
 		66E9D533181041A4002369F3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66E9D532181041A4002369F3 /* Foundation.framework */; };
 		66E9D535181041A4002369F3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66E9D534181041A4002369F3 /* CoreGraphics.framework */; };
@@ -36,6 +38,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		66B7D213181C4D0B00E62C73 /* APEClient_user.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APEClient_user.h; sourceTree = "<group>"; };
+		66B7D214181C4D0B00E62C73 /* APEClient_user.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APEClient_user.m; sourceTree = "<group>"; };
+		66B7D216181C4E9800E62C73 /* APEClient_channel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APEClient_channel.h; sourceTree = "<group>"; };
+		66B7D217181C4E9800E62C73 /* APEClient_channel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APEClient_channel.m; sourceTree = "<group>"; };
 		66BB84A718175B2E003F918C /* KBKeyboardHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KBKeyboardHandler.h; sourceTree = "<group>"; };
 		66BB84A818175B2E003F918C /* KBKeyboardHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KBKeyboardHandler.m; sourceTree = "<group>"; };
 		66BB84A918175B2E003F918C /* KBKeyboardHandlerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KBKeyboardHandlerDelegate.h; sourceTree = "<group>"; };
@@ -86,6 +92,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		66B7D212181C4CE900E62C73 /* APE Client */ = {
+			isa = PBXGroup;
+			children = (
+				66E9D567181041E9002369F3 /* APEClient.h */,
+				66E9D568181041E9002369F3 /* APEClient.m */,
+				66B7D213181C4D0B00E62C73 /* APEClient_user.h */,
+				66B7D214181C4D0B00E62C73 /* APEClient_user.m */,
+				66B7D216181C4E9800E62C73 /* APEClient_channel.h */,
+				66B7D217181C4E9800E62C73 /* APEClient_channel.m */,
+			);
+			name = "APE Client";
+			sourceTree = "<group>";
+		};
 		66BB84A618175B0A003F918C /* KBKeyboardHandler */ = {
 			isa = PBXGroup;
 			children = (
@@ -136,8 +155,7 @@
 				66E9D548181041A4002369F3 /* ViewController.m */,
 				66E9D54A181041A4002369F3 /* Images.xcassets */,
 				66E9D539181041A4002369F3 /* Supporting Files */,
-				66E9D567181041E9002369F3 /* APEClient.h */,
-				66E9D568181041E9002369F3 /* APEClient.m */,
+				66B7D212181C4CE900E62C73 /* APE Client */,
 				66BB84A618175B0A003F918C /* KBKeyboardHandler */,
 			);
 			path = "APE Client";
@@ -271,6 +289,8 @@
 			files = (
 				66BB84AA18175B2E003F918C /* KBKeyboardHandler.m in Sources */,
 				66E9D549181041A4002369F3 /* ViewController.m in Sources */,
+				66B7D215181C4D0B00E62C73 /* APEClient_user.m in Sources */,
+				66B7D218181C4E9800E62C73 /* APEClient_channel.m in Sources */,
 				66E9D543181041A4002369F3 /* AppDelegate.m in Sources */,
 				66E9D53F181041A4002369F3 /* main.m in Sources */,
 				66E9D569181041E9002369F3 /* APEClient.m in Sources */,

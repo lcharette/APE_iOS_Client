@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "APEClient.h"
+#import "APEClient_user.h"
 #import "KBKeyboardHandler.h"
 //#include <stdlib.h>
 
@@ -19,7 +20,7 @@
     APEClient *client;
     KBKeyboardHandler *keyboard;
     NSMutableArray *msgArray;
-    NSDictionary *userArray;
+    NSArray *userArray;
 }
 @synthesize msgInput;
 @synthesize userTableView;
@@ -37,7 +38,7 @@
     
     //Init Arrays
     msgArray = [[NSMutableArray alloc] init];
-    userArray = [[NSDictionary alloc] init];
+    userArray = [[NSArray alloc] init];
     
     //Get the APE Client instance
     client = [APEClient APEClient_init];
@@ -193,10 +194,8 @@
 {
     if (tableViewVar == userTableView) {
                 
-        //Dirty fix while APEuser object is implemeted
-        NSArray *keys = [userArray allKeys];
-        id aKey = [keys objectAtIndex:indexPath.row];
-        NSDictionary *userdata = [userArray objectForKey:aKey];
+        //Get the user object
+        APEClient_user *userdata = [userArray objectAtIndex:indexPath.row];
         
         //Get the cell
         static NSString *simpleTableIdentifier = @"userTableCell";
@@ -206,7 +205,7 @@
         }
         
         //Change the cell label
-        cell.textLabel.text = [userdata objectForKey:@"name"];
+        cell.textLabel.text = userdata.name;
         
         //Return the cell
         return cell;

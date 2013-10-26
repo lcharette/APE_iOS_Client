@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 APE-Project. All rights reserved.
 //
 
+#import "APEClient_channel.h"
+#import "APEClient_user.h"
 #import <Foundation/Foundation.h>
 
 @interface APEClient : NSObject <NSStreamDelegate>
@@ -32,6 +34,8 @@
 -(void) joinChannel:(NSString *)channelName;
 -(void) leftChannel:(NSString *)channelName;
 -(NSString*) encodeToPercentEscapeString:(NSString *)string;
-- (NSDictionary *) getChannelUsersFromName:(NSString *)channelName;
-- (NSDictionary *) getChannelUsersfromPubid:(NSString *)channelPubid;
+- (NSArray *) getChannelUsersFromName:(NSString *)channelName;
+- (NSArray *) getChannelUsersfromPubid:(NSString *)channelPubid;
+- (APEClient_channel *) getChannelfromPubid:(NSString *)channelPubid;
+- (APEClient_channel *) getChannelFromName:(NSString *)channelName;
 @end
