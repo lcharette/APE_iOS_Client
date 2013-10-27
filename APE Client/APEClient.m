@@ -342,7 +342,12 @@
     NSDictionary *users = [data objectForKey:@"users"];
     for(NSDictionary *user in users) {
         APEClient_user *This_user = [[APEClient_user alloc] initWithPubid:[user objectForKey:@"pubid"]];
-        [This_user setProperty:@"name" :[[user objectForKey:@"properties"] objectForKey:@"name"]];
+        
+        //Add all properties to the user's object
+        for(NSString* prop in [user objectForKey:@"properties"]) {
+            [This_user setProperty:prop :[[user objectForKey:@"properties"] objectForKey:prop]];
+        }
+        
         [APE_channel addUser:This_user];
     }
     
