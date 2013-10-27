@@ -44,7 +44,7 @@
 -(void)removeUserWithPubid:(NSString *)userPubid
 {
     for (int i = 0; i < [users count]; i++) {
-        if ([[users objectAtIndex:i] pubid] == userPubid) {
+        if ([[[users objectAtIndex:i] pubid] isEqualToString:userPubid]) {
             [users removeObjectAtIndex:i];
             return;
         }
