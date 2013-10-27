@@ -338,6 +338,11 @@
     APEClient_channel *APE_channel = [[APEClient_channel alloc] initWithPubid:pubid];
     APE_channel.name = [[pipe objectForKey:@"properties"] objectForKey:@"name"];
     
+    //Add all the channel properties to the channel object
+    for(NSString* prop in [pipe objectForKey:@"properties"]) {
+        [APE_channel setProperty:prop :[[pipe objectForKey:@"properties"] objectForKey:prop]];
+    }
+    
     //Loop users and add them to the channel object
     NSDictionary *users = [data objectForKey:@"users"];
     for(NSDictionary *user in users) {
