@@ -205,7 +205,7 @@
         }
         
         //Change the cell label
-        cell.textLabel.text = userdata.name;
+        cell.textLabel.text = [userdata getProperty:@"name"];
         
         //Return the cell
         return cell;

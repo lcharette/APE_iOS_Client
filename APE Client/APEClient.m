@@ -342,7 +342,7 @@
     NSDictionary *users = [data objectForKey:@"users"];
     for(NSDictionary *user in users) {
         APEClient_user *This_user = [[APEClient_user alloc] initWithPubid:[user objectForKey:@"pubid"]];
-        This_user.name = [[user objectForKey:@"properties"] objectForKey:@"name"];
+        [This_user setProperty:@"name" :[[user objectForKey:@"properties"] objectForKey:@"name"]];
         [APE_channel addUser:This_user];
     }
     
@@ -379,7 +379,7 @@
     
     //Create a user objet and add it to the channel
     APEClient_user *This_user = [[APEClient_user alloc] initWithPubid:[user objectForKey:@"pubid"]];
-    This_user.name = [[user objectForKey:@"properties"] objectForKey:@"name"];
+    [This_user setProperty:@"name" :[[user objectForKey:@"properties"] objectForKey:@"name"]];
     [APE_channel addUser:This_user];
     
     //Update the dictionnary

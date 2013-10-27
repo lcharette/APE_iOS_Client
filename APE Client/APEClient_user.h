@@ -11,8 +11,11 @@
 @interface APEClient_user : NSObject
 
 @property (nonatomic, readonly) NSString *pubid;
-@property (nonatomic) NSMutableDictionary *properties;
-@property (nonatomic) NSString *name;
+@property (nonatomic, readonly) NSMutableDictionary *properties;
 
-- (id)initWithPubid:(NSString *)this_pubid;
+- (id) initWithPubid:(NSString *)this_pubid;
+- (void) setProperty:(NSString *)PropertyName :(id)PropertyValue;
+- (id) getProperty:(NSString *)PropertyName;
+- (void) delProperty:(NSString *)PropertyName;
+
 @end

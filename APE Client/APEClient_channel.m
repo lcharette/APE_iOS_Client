@@ -12,6 +12,7 @@
 @synthesize pubid;
 @synthesize users;
 @synthesize name;
+@synthesize properties;
 
 -(id)initWithPubid:(NSString *)this_pubid
 {
@@ -24,6 +25,7 @@
         
         //Init other objets
         users = [[NSMutableArray alloc] init];
+        properties = [[NSMutableDictionary alloc] init];
         
         return self;
     
@@ -48,5 +50,21 @@
         }
     }
 }
+
+-(void)setProperty:(NSString *)PropertyName :(id)PropertyValue
+{
+    [properties setObject:PropertyValue forKey:PropertyName];
+}
+
+-(id)getProperty:(NSString *)PropertyName
+{
+    return [properties objectForKey:PropertyName];
+}
+
+-(void)delProperty:(NSString *)PropertyName
+{
+    [properties removeObjectForKey:PropertyName];
+}
+
 
 @end

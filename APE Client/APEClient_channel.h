@@ -13,10 +13,13 @@
 
 @property (nonatomic, readonly) NSString *pubid;
 @property (nonatomic, readonly) NSMutableArray *users;
+@property (nonatomic, readonly) NSMutableDictionary *properties;
 @property (nonatomic) NSString *name;
 
--(id)initWithPubid:(NSString *)pubid;
--(void)addUser:(APEClient_user *)user;
--(void)removeUserWithPubid:(NSString *)userPubid;
-
+- (id) initWithPubid:(NSString *)pubid;
+- (void) addUser:(APEClient_user *)user;
+- (void) removeUserWithPubid:(NSString *)userPubid;
+- (void) setProperty:(NSString *)PropertyName :(id)PropertyValue;
+- (id) getProperty:(NSString *)PropertyName;
+- (void) delProperty:(NSString *)PropertyName;
 @end
