@@ -102,7 +102,7 @@
 -(void) raw_DATA:(NSNotification *)notification
 {
     //Get the notification
-    NSDictionary *data = notification.userInfo;
+    NSDictionary *data = [notification.userInfo objectForKey:@"data"];
     
     //Get the data from the notification
     NSString *from = [[[data objectForKey:@"from"] objectForKey:@"properties"] objectForKey:@"name"];

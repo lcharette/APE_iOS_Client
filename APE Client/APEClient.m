@@ -268,18 +268,22 @@
             
             //Again, we split around the dictionnary since APE can put multiple RAW in the same request.
             for (NSDictionary* RawData in dataLineDictionary) {
-                [self parseRAW:RawData];
+                //[self parseRAW:RawData];
+                
+                //We call the "event" using notificationCenter. If the event doesn't exist, it's just ignored.
+                NSString *notificationName = [[NSString alloc] initWithFormat:@"APE_%@", [RawData objectForKey:@"raw"]];
+                [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:RawData];
             }
         }
     }
 }
 
--(void) parseRAW:(NSDictionary *)rawData
+/*-(void) parseRAW:(NSDictionary *)rawData
 {
     //We call the "event" using notificationCenter. If the event doesn't exist, it's just ignored.
     NSString *notificationName = [[NSString alloc] initWithFormat:@"APE_%@", [rawData objectForKey:@"raw"]];
     [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:[rawData objectForKey:@"data"]];
-}
+}*/
 
 # pragma mark - RAW Events
 
@@ -305,7 +309,7 @@
 -(void) raw_LOGIN:(NSNotification *)notification
 {
     //Get the sessid from the raw
-    NSDictionary *data = notification.userInfo;
+    NSDictionary *data = [notification.userInfo objectForKey:@"data"];
     APE_sessid = [data objectForKey:@"sessid"];
     
     //We are connected now.
@@ -326,7 +330,7 @@
 -(void) raw_CHANNEL:(NSNotification *)notification
 {
     //Get the data
-    NSDictionary *data = notification.userInfo;
+    NSDictionary *data = [notification.userInfo objectForKey:@"data"];
     
     //Todo: Is the channel already in the dictionnary?
     
@@ -363,7 +367,7 @@
 -(void) raw_LEFT:(NSNotification *)notification
 {
     //Get the data
-    NSDictionary *data = notification.userInfo;
+    NSDictionary *data = [notification.userInfo objectForKey:@"data"];
     NSDictionary *user = [data objectForKey:@"user"];
     NSString *channelPubid = [[data objectForKey:@"pipe"] objectForKey:@"pubid"];
     
@@ -380,7 +384,7 @@
 -(void) raw_JOIN:(NSNotification *)notification
 {
     //Get the data
-    NSDictionary *data = notification.userInfo;
+    NSDictionary *data = [notification.userInfo objectForKey:@"data"];
     NSDictionary *user = [data objectForKey:@"user"];
     NSString *channelPubid = [[data objectForKey:@"pipe"] objectForKey:@"pubid"];
     
@@ -398,7 +402,7 @@
 
 -(void) raw_ERR:(NSNotification *)notification
 {
-    NSDictionary *data = notification.userInfo;
+    NSDictionary *data = [notification.userInfo objectForKey:@"data"];
     NSString *errormsg = [[NSString alloc] initWithFormat:@"Error %@: %@", [data objectForKey:@"code"], [data objectForKey:@"value"]];
     
     //Show an alert
