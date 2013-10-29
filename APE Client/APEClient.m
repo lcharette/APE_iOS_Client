@@ -268,22 +268,18 @@
             
             //Again, we split around the dictionnary since APE can put multiple RAW in the same request.
             for (NSDictionary* RawData in dataLineDictionary) {
-                //[self parseRAW:RawData];
-                
-                //We call the "event" using notificationCenter. If the event doesn't exist, it's just ignored.
-                NSString *notificationName = [[NSString alloc] initWithFormat:@"APE_%@", [RawData objectForKey:@"raw"]];
-                [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:RawData];
+                [self parseRAW:RawData];
             }
         }
     }
 }
 
-/*-(void) parseRAW:(NSDictionary *)rawData
+-(void) parseRAW:(NSDictionary *)rawData
 {
     //We call the "event" using notificationCenter. If the event doesn't exist, it's just ignored.
     NSString *notificationName = [[NSString alloc] initWithFormat:@"APE_%@", [rawData objectForKey:@"raw"]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:[rawData objectForKey:@"data"]];
-}*/
+    [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:rawData];
+}
 
 # pragma mark - RAW Events
 
