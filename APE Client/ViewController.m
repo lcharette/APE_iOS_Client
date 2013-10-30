@@ -274,7 +274,7 @@
     if (![msg  isEqual: @""] && client.APE_connected) {
         
         //Append the message
-        [self appendMsg:msg:client.APE_name];
+        [self appendMsg:msg:[client.APE_user getProperty:@"name"]];
         
         //Encode before sending
         msg = [client encodeToPercentEscapeString:msg];
