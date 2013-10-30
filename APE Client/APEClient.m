@@ -315,7 +315,9 @@
     APE_connected = TRUE;
     
     //Log...
-    NSLog(@"APE SESSID --> %@", [APE_user getProperty:@"sessid"]);
+    if (APE_debug) {
+        NSLog(@"APE SESSID --> %@", [APE_user getProperty:@"sessid"]);
+    }
     
     //Init the "CHECK" command interval
     APE_Check = [NSTimer scheduledTimerWithTimeInterval: 20.0
