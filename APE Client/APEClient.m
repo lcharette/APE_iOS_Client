@@ -16,10 +16,9 @@
     BOOL APE_init_connection;
     NSTimer *APE_Check;
     NSTimer *APE_connection_timeout;
-    NSString *APE_sessid;
     NSInteger APE_chl;
 }
-@synthesize inputStream, outputStream, APE_host, APE_port, APE_name, APE_debug, APE_channelList, APE_connected;
+@synthesize inputStream, outputStream, APE_host, APE_port, APE_debug, APE_channelList, APE_connected, APE_user;
 
 + (id)APEClient_init {
     static APEClient *init = nil;
@@ -37,11 +36,12 @@
         
         //Default variables here
         APE_debug = FALSE;
-        APE_sessid = @"";
-        APE_name = @"";
         APE_socket_input_open = APE_socket_output_open = APE_socket_output_ready = FALSE;
         APE_connected = FALSE;
         APE_init_connection = FALSE;
+        
+        //Init the user object
+        APE_user = [[APEClient_user alloc] init];
         
         //Init the channelList dictionnary
         APE_channelList = [[NSMutableDictionary alloc] init];
@@ -81,8 +81,8 @@
     }
     
     //Do we have a sessid?
-    if (![APE_sessid isEqual: @""]) {
-        [cmd setObject:APE_sessid forKey:@"sessid"];
+    if ([APE_user getProperty:@"sessid"] != nil) {
+        [cmd setObject:[APE_user getProperty:@"sessid"] forKey:@"sessid"];
     }
     
     //We translate the dictionnary to a JSON data
@@ -161,10 +161,10 @@
     //Start a timer for connection timeout
     [APE_connection_timeout invalidate];
     APE_connection_timeout = [NSTimer scheduledTimerWithTimeInterval: 15.0
-                                                 target: self
-                                               selector: @selector(connect_err)
-                                               userInfo: nil
-                                                repeats: NO];
+                                                              target: self
+                                                            selector: @selector(connect_err)
+                                                            userInfo: nil
+                                                             repeats: NO];
 }
 
 //This one is only good if port & host is already defined
@@ -291,12 +291,13 @@
     NSMutableDictionary *dataToSend = [[NSMutableDictionary alloc] init];
     
     //If we don't have a nickname, we create one
-    if ([APE_name  isEqual: @""]) {
-        APE_name = [[NSString alloc] initWithFormat:@"iOS%u", (arc4random()%1000)];
+    if ([APE_user getProperty:@"name"] == nil) {
+        NSString *tempName = [[NSString alloc] initWithFormat:@"iOS%u", (arc4random()%1000)];
+        [APE_user setProperty:@"name" :tempName];
     }
-
+    
     //Add to the request
-    [dataToSend setObject:APE_name forKey:@"name"];
+    [dataToSend setObject:[APE_user getProperty:@"name"] forKey:@"name"];
     
     //Send to the client
     [self sendCmd:@"CONNECT" :dataToSend];
@@ -306,13 +307,15 @@
 {
     //Get the sessid from the raw
     NSDictionary *data = [notification.userInfo objectForKey:@"data"];
-    APE_sessid = [data objectForKey:@"sessid"];
+    
+    //Add the sessid as a user propertie
+    [APE_user setProperty:@"sessid" :[data objectForKey:@"sessid"]];
     
     //We are connected now.
     APE_connected = TRUE;
     
     //Log...
-    NSLog(@"APE SESSID --> %@", APE_sessid);
+    NSLog(@"APE SESSID --> %@", [APE_user getProperty:@"sessid"]);
     
     //Init the "CHECK" command interval
     APE_Check = [NSTimer scheduledTimerWithTimeInterval: 20.0
@@ -501,7 +504,7 @@
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"APE_DISCONNECT" object:self userInfo:nil];
                 
             } else if (theStream == outputStream) {
-                 NSLog(@"Stream output closed");
+                NSLog(@"Stream output closed");
                 //We can't send anything anymore.
                 APE_socket_output_open = APE_socket_output_ready = FALSE;
                 
@@ -538,11 +541,13 @@
     self.inputStream = nil;
     
     //Clear some variables and objects
-    APE_name = @"";
     APE_socket_input_open = APE_socket_output_open = APE_socket_output_ready = FALSE;
     APE_connected = FALSE;
     APE_init_connection = FALSE;
     APE_channelList = [[NSMutableDictionary alloc] init];
+    
+    //Destroy the user object
+    APE_user = [[APEClient_user alloc] init];
 }
 
 -(void) connect_err
