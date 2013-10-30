@@ -139,7 +139,7 @@
     NSLog(@"APE CLient: Connecting to %@:%ld", APE_host, APE_port);
     
     //Just in case, we reset the vars
-    [self disconnect];
+    [self clearSocketVar];
     
     //Create the socket
     CFReadStreamRef readStream;
@@ -292,8 +292,8 @@
     
     //If we don't have a nickname, we create one
     if ([APE_user getProperty:@"name"] == nil) {
-        NSString *tempName = [[NSString alloc] initWithFormat:@"iOS%u", (arc4random()%1000)];
-        [APE_user setProperty:@"name" :tempName];
+        NSInteger tempName =[[NSDate date] timeIntervalSince1970];
+        [APE_user setProperty:@"name" :[NSString stringWithFormat:@"%ld", (long)tempName]];
     }
     
     //Add to the request
@@ -531,6 +531,17 @@
 
 -(void) disconnect
 {
+    //Clear the socket
+    [self clearSocketVar];
+    
+    //Clear the channel list. We will reconnect
+    APE_channelList = [[NSMutableDictionary alloc] init];
+    
+    //Reset the user object
+    APE_user = [[APEClient_user alloc] init];
+}
+- (void) clearSocketVar
+{
     //Close both streams
     //First the output
     [self.outputStream close];
@@ -546,10 +557,6 @@
     APE_socket_input_open = APE_socket_output_open = APE_socket_output_ready = FALSE;
     APE_connected = FALSE;
     APE_init_connection = FALSE;
-    APE_channelList = [[NSMutableDictionary alloc] init];
-    
-    //Destroy the user object
-    APE_user = [[APEClient_user alloc] init];
 }
 
 -(void) connect_err
@@ -574,4 +581,11 @@
     
     return [temp stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 }
+
+#pragma mark - User handling
+- (void) setUserProperty:(NSString *)name :(id)value
+{
+    [APE_user setProperty:name :value];
+}
+
 @end

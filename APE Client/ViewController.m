@@ -46,6 +46,11 @@
     //Debug
     //client.APE_debug = TRUE;
     
+    //Set random name.
+    //TODO: This is not persistent when the client reconnect since the name would then be marked as used by APE
+    NSString *username = [[NSString alloc] initWithFormat:@"iOS%u", (arc4random()%1000)];
+    [client setUserProperty:@"name" :username];
+    
     //Connect to APE
     [client connect:@"ape.local":6969];
     

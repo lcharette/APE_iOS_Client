@@ -38,4 +38,6 @@
 - (NSArray *) getChannelUsersfromPubid:(NSString *)channelPubid;
 - (APEClient_channel *) getChannelfromPubid:(NSString *)channelPubid;
 - (APEClient_channel *) getChannelFromName:(NSString *)channelName;
+
+- (void) setUserProperty:(NSString *)name :(id)value;
 @end
