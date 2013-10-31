@@ -7,10 +7,9 @@
 //
 
 #import "ViewController.h"
-#import "APEClient.h"
-#import "APEClient_user.h"
+#import "APEClient/APEClient.h"
+#import "APEClient/APEClient_user.h"
 #import "KBKeyboardHandler.h"
-//#include <stdlib.h>
 
 @interface ViewController ()
 

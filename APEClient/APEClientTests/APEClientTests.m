@@ -1,18 +1,18 @@
 //
-//  APE_ClientTests.m
-//  APE ClientTests
+//  APEClientTests.m
+//  APEClientTests
 //
-//  Created by Louis Charette on 2013-10-17.
-//  Copyright (c) 2013 APE-Project. All rights reserved.
+//  Created by Louis Charette on 2013-10-30.
+//  Copyright (c) 2013 APE Project. All rights reserved.
 //
 
 #import <XCTest/XCTest.h>
 
-@interface APE_ClientTests : XCTestCase
+@interface APEClientTests : XCTestCase
 
 @end
 
-@implementation APE_ClientTests
+@implementation APEClientTests
 
 - (void)setUp
 {

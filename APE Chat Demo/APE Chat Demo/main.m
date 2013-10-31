@@ -1,9 +1,9 @@
 //
 //  main.m
-//  APE Client
+//  APE Chat Demo
 //
-//  Created by Louis Charette on 2013-10-17.
-//  Copyright (c) 2013 APE-Project. All rights reserved.
+//  Created by Louis Charette on 2013-10-30.
+//  Copyright (c) 2013 APE Project. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

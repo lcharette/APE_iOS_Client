@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:APE Client.xcodeproj">
+      location = "self:APEClient.xcodeproj">
    </FileRef>
 </Workspace>

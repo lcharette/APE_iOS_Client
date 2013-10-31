@@ -4,7 +4,7 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>APE Client.xcscheme</key>
+		<key>APE Chat Demo.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
@@ -12,12 +12,12 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>66E9D52E181041A4002369F3</key>
+		<key>663DADED182208BD00DCF42D</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>66E9D54F181041A4002369F3</key>
+		<key>663DAE0E182208BE00DCF42D</key>
 		<dict>
 			<key>primary</key>
 			<true/>

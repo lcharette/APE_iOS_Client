@@ -404,15 +404,7 @@
 -(void) raw_ERR:(NSNotification *)notification
 {
     NSDictionary *data = [notification.userInfo objectForKey:@"data"];
-    NSString *errormsg = [[NSString alloc] initWithFormat:@"Error %@: %@", [data objectForKey:@"code"], [data objectForKey:@"value"]];
-    
-    //Show an alert
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"APE Error"
-                                                        message:errormsg
-                                                       delegate:self
-                                              cancelButtonTitle:@"Ok"
-                                              otherButtonTitles:nil, nil];
-    [alertView show];
+    NSLog(@"APE CLIENT ERROR [%@] : %@", [data objectForKey:@"code"], [data objectForKey:@"value"]);
 }
 
 #pragma mark - Misc Command

@@ -1,13 +1,13 @@
 //
 //  AppDelegate.m
-//  APE Client
+//  APE Chat Demo
 //
-//  Created by Louis Charette on 2013-10-17.
-//  Copyright (c) 2013 APE-Project. All rights reserved.
+//  Created by Louis Charette on 2013-10-30.
+//  Copyright (c) 2013 APE Project. All rights reserved.
 //
 
 #import "AppDelegate.h"
-#import "APEClient.h"
+#import "APEClient/APEClient.h"
 
 @implementation AppDelegate
 
@@ -38,6 +38,7 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+    
     //Get the APE Client instance
     APEClient *client = [APEClient APEClient_init];
     [client connect];
