@@ -17,6 +17,7 @@
 @property (nonatomic) CFStringRef APE_host;
 @property (nonatomic) long APE_port;
 @property (nonatomic) BOOL APE_debug;
+@property (nonatomic) BOOL APS_support;
 @property (nonatomic) NSMutableDictionary *APE_channelList;
 @property (nonatomic) BOOL APE_connected;
 @property (nonatomic) APEClient_user *APE_user;

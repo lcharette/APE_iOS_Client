@@ -18,7 +18,7 @@
     NSTimer *APE_connection_timeout;
     NSInteger APE_chl;
 }
-@synthesize inputStream, outputStream, APE_host, APE_port, APE_debug, APE_channelList, APE_connected, APE_user;
+@synthesize inputStream, outputStream, APE_host, APE_port, APE_debug, APS_support, APE_channelList, APE_connected, APE_user;
 
 + (id)APEClient_init {
     static APEClient *init = nil;
@@ -36,6 +36,7 @@
         
         //Default variables here
         APE_debug = FALSE;
+        APS_support = FALSE;
         APE_socket_input_open = APE_socket_output_open = APE_socket_output_ready = FALSE;
         APE_connected = FALSE;
         APE_init_connection = FALSE;
@@ -280,8 +281,21 @@
 
 -(void) parseRAW:(NSDictionary *)rawData
 {
+    //Get the raw
+    NSString *raw = [rawData objectForKey:@"raw"];
+    
+    //Check for support for ApePubSub events
+    //This will translate APS Events to Raws for easier integration
+    //between the two JSFs
+    if (APS_support && [raw isEqualToString:@"EVENT"]) {
+            
+            //If so, the event name replace the raw name
+            NSString *eventName = [[rawData objectForKey:@"data"] objectForKey:@"event"];
+            raw = eventName;
+    }
+    
     //We call the "event" using notificationCenter. If the event doesn't exist, it's just ignored.
-    NSString *notificationName = [[NSString alloc] initWithFormat:@"APE_%@", [rawData objectForKey:@"raw"]];
+    NSString *notificationName = [[NSString alloc] initWithFormat:@"APE_%@", raw];
     [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:rawData];
 }
 
