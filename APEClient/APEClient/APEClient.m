@@ -261,10 +261,14 @@
             }
             
             //Parse to JSON. The string need to first be translated into an NSData before beeing converted to a Dictionnary
-            NSError *error1;
-            NSDictionary * dataLineDictionary = [NSJSONSerialization JSONObjectWithData:[dataLineString dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error1];
+            NSError *json_error;
+            NSDictionary * dataLineDictionary = [NSJSONSerialization JSONObjectWithData:[dataLineString dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&json_error];
             
-            //TODO: Catch error
+            //Catch error
+            if (json_error != NULL) {
+                
+                NSLog(@"Error while parsing json data : %@\n%@\n\n",[json_error localizedDescription], dataLineString);
+            }
             
             //Again, we split around the dictionnary since APE can put multiple RAW in the same request.
             for (NSDictionary* RawData in dataLineDictionary) {
@@ -379,7 +383,9 @@
     [APE_channel removeUserWithPubid:[user objectForKey:@"pubid"]];
     
     //Update the dictionnary
-    [APE_channelList setObject:APE_channel forKey:channelPubid];
+    if (APE_channel != NULL) {
+        [APE_channelList setObject:APE_channel forKey:channelPubid];
+    }
 }
 
 -(void) raw_JOIN:(NSNotification *)notification
