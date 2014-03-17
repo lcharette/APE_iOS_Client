@@ -314,8 +314,16 @@
         [APE_user setProperty:@"name" :[NSString stringWithFormat:@"%ld", (long)tempName]];
     }
     
-    //Add to the request
-    [dataToSend setObject:[APE_user getProperty:@"name"] forKey:@"name"];
+    //Add the user properties to the request
+    //Check for APS support
+    if (APS_support) {
+    
+        //We get all the user properties and placce it inside "user" param
+        [dataToSend setObject:APE_user.properties forKey:@"user"];
+        
+    } else {
+        [dataToSend setObject:[APE_user getProperty:@"name"] forKey:@"name"];
+    }
     
     //Send to the client
     [self sendCmd:@"CONNECT" :dataToSend];
