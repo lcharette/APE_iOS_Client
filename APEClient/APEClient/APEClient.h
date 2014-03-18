@@ -22,6 +22,9 @@
 @property (nonatomic) BOOL APE_connected;
 @property (nonatomic) APEClient_user *APE_user;
 
+//This is used to buffer the input from the server until we have a complete command (i.e. a line break)
+@property (nonatomic, strong) NSString *inputBuffer;
+
 + (id)APEClient_init;
 
 - (void) sendCmd:(NSString *)command :(NSDictionary *)data;

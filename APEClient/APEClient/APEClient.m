@@ -137,6 +137,7 @@
     self.APE_port = port;
     self.APE_host = CFBridgingRetain(host);
     
+    //Debug sent to the console everytime
     NSLog(@"APE CLient: Connecting to %@:%ld", APE_host, APE_port);
     
     //Just in case, we reset the vars
@@ -241,39 +242,61 @@
 
 -(void) parseRequest:(NSString *)requestData
 {
-    //Trim the data once to get rid of extra empty lines
-    requestData = [requestData stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
-    //Divide the data by lines
-    NSArray* dataLines = [requestData componentsSeparatedByCharactersInSet: [NSCharacterSet newlineCharacterSet]];
+    if (self.inputBuffer != nil) {
+        
+        //If the buffer is not empty, we append the new data to it
+        self.inputBuffer = [[NSString alloc] initWithFormat:@"%@%@", self.inputBuffer, requestData];
+        
+    } else {
+        
+        //If the buffer is empty, we simply put the data in it
+        self.inputBuffer = requestData;
+    }
     
-    //Loop for each lines returnes
-    for (NSString *dataLine in dataLines) {
+    //We check if we have a complete command in the buffer. To have a complete
+    //command, we need the last caracter to be a linebreak "\n". Otherwise, it
+    //Mean the data received from the stream was trunctated because it excedded the buffer size
+    if ([self.inputBuffer hasSuffix:@"\n"]) {
         
-        //Trim the data again to get rid of spaces
-        NSString *dataLineString = [dataLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         
-        //We test if the line is not empty and correspond to a JSON string
-        if (![dataLineString  isEqual: @""] && [[dataLineString substringToIndex:1]  isEqual: @"["]) {
+        //Trim the data once to get rid of extra empty lines
+        NSString *receivedData = [self.inputBuffer stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        
+        //We can now empty the buffer since it's been place in a new variable
+        self.inputBuffer = nil;
+        
+        //Divide the data by lines
+        NSArray* dataLines = [receivedData componentsSeparatedByCharactersInSet: [NSCharacterSet newlineCharacterSet]];
+        
+        //Loop for each lines returnes
+        for (NSString *dataLine in dataLines) {
             
-            //Debug
-            if (APE_debug) {
-                NSLog(@"\n------ RECEIVED ------\n%@\n---------------------", dataLineString);
-            }
+            //Trim the data again to get rid of spaces
+            NSString *dataLineString = [dataLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
             
-            //Parse to JSON. The string need to first be translated into an NSData before beeing converted to a Dictionnary
-            NSError *json_error;
-            NSDictionary * dataLineDictionary = [NSJSONSerialization JSONObjectWithData:[dataLineString dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&json_error];
-            
-            //Catch error
-            if (json_error != NULL) {
+            //We test if the line is not empty and correspond to a JSON string
+            if (![dataLineString  isEqual: @""] && [[dataLineString substringToIndex:1]  isEqual: @"["]) {
                 
-                NSLog(@"Error while parsing json data : %@\n%@\n\n",[json_error localizedDescription], dataLineString);
-            }
-            
-            //Again, we split around the dictionnary since APE can put multiple RAW in the same request.
-            for (NSDictionary* RawData in dataLineDictionary) {
-                [self parseRAW:RawData];
+                //Debug
+                if (APE_debug) {
+                    NSLog(@"\n------ RECEIVED ------\n%@\n---------------------", dataLineString);
+                }
+                
+                //Parse to JSON. The string need to first be translated into an NSData before beeing converted to a Dictionnary
+                NSError *json_error;
+                NSDictionary * dataLineDictionary = [NSJSONSerialization JSONObjectWithData:[dataLineString dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&json_error];
+                
+                //Catch error
+                if (json_error != NULL) {
+                    
+                    NSLog(@"Error while parsing json data : %@\n%@\n\n",[json_error localizedDescription], dataLineString);
+                }
+                
+                //Again, we split around the dictionnary since APE can put multiple RAW in the same request.
+                for (NSDictionary* RawData in dataLineDictionary) {
+                    [self parseRAW:RawData];
+                }
             }
         }
     }
@@ -472,9 +495,12 @@
 		case NSStreamEventHasBytesAvailable:
             
 			if (theStream == inputStream) {
+    
                 
-				uint8_t buffer[4096]; //TODO: Maybe use smaller buffer and chunck technique
+				uint8_t buffer[1024]; //Small buffer, but we're using the chunck technique here
 				NSInteger len;
+                
+                //Loop while we have available data
 				while ([inputStream hasBytesAvailable]) {
 					len = [inputStream read:buffer maxLength:sizeof(buffer)];
 					if (len > 0) {
@@ -487,7 +513,7 @@
             }
             
             break;
-			
+		
 		case NSStreamEventErrorOccurred:
 			
 			NSLog(@"Can not connect to the host!");
