@@ -448,7 +448,13 @@
         
         //Create a user objet and add it to the channel
         APEClient_user *This_user = [[APEClient_user alloc] initWithPubid:[user objectForKey:@"pubid"]];
-        [This_user setProperty:@"name" :[[user objectForKey:@"properties"] objectForKey:@"name"]];
+        
+        //We then set the other properties to the user's object
+        for(NSString* prop in [user objectForKey:@"properties"]) {
+            [This_user setProperty:prop :[[user objectForKey:@"properties"] objectForKey:prop]];
+        }
+        
+        //Ass this user to the channel
         [APE_channel addUser:This_user];
         
         //Update the dictionnary
