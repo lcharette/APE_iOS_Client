@@ -20,6 +20,7 @@
     KBKeyboardHandler *keyboard;
     NSMutableArray *msgArray;
     NSArray *userArray;
+    NSString *ChannelName;
 }
 @synthesize msgInput;
 @synthesize userTableView;
@@ -31,6 +32,9 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    
+    //Define which channel we will use
+    ChannelName = @"chatdemo";
     
     //Add delegate to capture the enterkey on the inputField
     msgInput.delegate = self;
@@ -51,7 +55,7 @@
     [client setUserProperty:@"name" :username];
     
     //Connect to APE
-    [client connect:@"ape.local":6969];
+    [client connect:@"ape-project.org":6969];
     
     //Listen for events
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(raw_LOGIN:) name:@"APE_LOGIN" object:nil];
@@ -94,13 +98,13 @@
 
 -(void) updateUserList:(NSNotification *)notification
 {
-    userArray = [client getChannelUsersFromName:@"test"];
+    userArray = [client getChannelUsersFromName:ChannelName];
     [userTableView reloadData];
 }
 
 -(void) raw_LOGIN:(NSNotification *)notification
 {
-    [client joinChannel:@"test"];
+    [client joinChannel:ChannelName];
 }
 
 -(void) raw_DATA:(NSNotification *)notification
@@ -128,7 +132,7 @@
 
 -(void) raw_CONNECT
 {
-    self.msgInput.text = @"Connecting to 'test' channel";
+    self.msgInput.text = [[NSString alloc] initWithFormat:@"Connecting to '%@' channel", ChannelName];
 }
 
 -(void) raw_DISCONNECT
@@ -286,7 +290,7 @@
         //Send to channel
         NSMutableDictionary *dataToSend = [[NSMutableDictionary alloc] init];
         [dataToSend setObject:msg forKey:@"msg"];
-        [client sendCmdToChannel:@"SEND" :@"test" :dataToSend];
+        [client sendCmdToChannel:@"SEND" :ChannelName :dataToSend];
         
         //Clear the text input
         msgInput.text = @"";
