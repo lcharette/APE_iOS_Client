@@ -473,7 +473,7 @@
             
 			if (theStream == inputStream) {
                 
-				uint8_t buffer[1024];
+				uint8_t buffer[4096]; //TODO: Maybe use smaller buffer and chunck technique
 				NSInteger len;
 				while ([inputStream hasBytesAvailable]) {
 					len = [inputStream read:buffer maxLength:sizeof(buffer)];
