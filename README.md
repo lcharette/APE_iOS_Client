@@ -2,7 +2,7 @@ APE iOS Client
 ==============
 The APE iOS Client is a client used to connect to the [APE Server](http://ape-project.org/) [See [APE Server on GitHub](https://github.com/APE-Project/APE_Server)]. 
 
-The client consist for now in a demo iPad app. This demo app connect and can exchange messages with the _APE Chat Demo_ bundle with [APE JSF](https://github.com/APE-Project/APE_JSF). 
+The client consist for now in a demo iPad app. This demo app connect and can exchange messages with the [_APE Chat Demo_](http://ape-project.org/demos/chat/) bundle with [APE JSF](https://github.com/APE-Project/APE_JSF). Support for [ApePubSub](https://github.com/ptejada/ApePubSub) is also avaiable withing the iOS client.
 
 This code is still in beta stage. It does connect and interact with the chat demo, but hasn't been fully tested and implemented yet. See **Contribute** for more infos.
 
@@ -31,9 +31,9 @@ Other solution exist on the web for realtime interaction (APNS). But none if the
 This client uses native iOS socket streams to open a connexion to the APE Server and act as a XHRStreaming client on the server to send and receive JSON encoded data in realtime.
 
 ## Requirements
-This client requires a **patched version of APE Server 1.1.3-DEV**. See [Pull Request](https://github.com/lcharette/APE_Server/tree/fe98daf9db61410cb4358f248b74975cbd6072cb). 
+This client requires the **latest devopement version (APE Server 1.1.3-DEV)** avaiable on the official APE GitHub Repositorie. See [https://github.com/APE-Project/APE_Server](https://github.com/APE-Project/APE_Server). 
 
-This patch fix an issue that cause "BAD_JSON" event to be returned from APE Server when small request are sent to the server. Just download the source code, build it (see [APE Documentation](http://ape-project.org/wiki/index.php?page=Main+page)), locally run APE and edit the url and port in the app's viewcontroler and you're good to go!
+Just download the source code, build it (see [APE Documentation](http://ape-project.org/wiki/index.php?page=Main+page)), locally run APE and edit the url and port in the app's viewcontroler and you're good to go! The demo app can also run on [the official APE Demo Server and APE Chat Demo](http://ape-project.org/demos/chat/).
 
 
 # Contribute
