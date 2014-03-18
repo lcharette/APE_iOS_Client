@@ -443,13 +443,18 @@
     //Get the channel object from the master channel list
     APEClient_channel *APE_channel = [APE_channelList objectForKey:channelPubid];
     
-    //Create a user objet and add it to the channel
-    APEClient_user *This_user = [[APEClient_user alloc] initWithPubid:[user objectForKey:@"pubid"]];
-    [This_user setProperty:@"name" :[[user objectForKey:@"properties"] objectForKey:@"name"]];
-    [APE_channel addUser:This_user];
-    
-    //Update the dictionnary
-    [APE_channelList setObject:APE_channel forKey:channelPubid];
+    //Little something to avoid errors related to the setObject
+    if (APE_channel != NULL) {
+        
+        //Create a user objet and add it to the channel
+        APEClient_user *This_user = [[APEClient_user alloc] initWithPubid:[user objectForKey:@"pubid"]];
+        [This_user setProperty:@"name" :[[user objectForKey:@"properties"] objectForKey:@"name"]];
+        [APE_channel addUser:This_user];
+        
+        //Update the dictionnary
+        [APE_channelList setObject:APE_channel forKey:channelPubid];
+        
+    }
 }
 
 -(void) raw_ERR:(NSNotification *)notification
