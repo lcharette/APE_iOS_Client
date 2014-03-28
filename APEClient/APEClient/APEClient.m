@@ -454,7 +454,7 @@
             [This_user setProperty:prop :[[user objectForKey:@"properties"] objectForKey:prop]];
         }
         
-        //Ass this user to the channel
+        //Add this user to the channel
         [APE_channel addUser:This_user];
         
         //Update the dictionnary
